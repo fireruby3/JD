@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>ジェーン・ドゥの怪物</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Klee+One:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Serif+KR:wght@500;700;900&family=Noto+Sans+KR:wght@400;700&family=Gowun+Dodum&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;700&family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;700&display=swap">
+<style>
+/* 夜の子供部屋で「今日を終える」と、朝の光の中で本編が開く。本編は朝の色、忘却が進むほど白紙に近づく */
+:root{
+  --morning:#eef1f3; --morning-2:#e2e7ec; --sheet:#fbfbfa; --ink:#25233a; --ink-soft:#5a5870; --mute:#8a8a9c;
+  --night:#14121d; --night-2:#1d1a29; --moon:#ece4d6;
+  --garnet:#b8324a; --aqua:#2aa9a0; --tanz:#6a5fc8; --sun:#f0b25e; --line:#cfd5dc;
+  --display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --hand:"Klee One","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --forget:0;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--morning);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.9;letter-spacing:.02em;overflow-x:hidden}
+body.locked{overflow:hidden;background:var(--night)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--aqua);outline-offset:3px}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ===== 入口:夜の子供部屋 ===== */
+#entry{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse 60% 50% at 70% 35%,#2a2540 0%,transparent 70%),var(--night);color:var(--moon);display:grid;place-items:center;overflow:hidden;transition:opacity 1.2s}
+#entry.gone{opacity:0;pointer-events:none}
+.room{position:absolute;inset:0;pointer-events:none}
+.win{position:absolute;right:8%;top:12%;width:min(38vw,420px);aspect-ratio:4/5;border:10px solid #3a3446;border-radius:4px;overflow:hidden;background:linear-gradient(#1b2350 0%,#3a3f78 55%,#55507e 62%,#2b3560 63%,#1c2448 100%);box-shadow:0 0 120px rgba(160,170,255,.12)}
+.win::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:8px;margin-left:-4px;background:#3a3446}
+.win::after{content:"";position:absolute;top:44%;left:0;right:0;height:8px;background:#3a3446}
+.moon{position:absolute;width:13%;aspect-ratio:1;border-radius:50%;background:#f4eedc;left:62%;top:22%;box-shadow:0 0 40px 12px rgba(244,238,220,.35)}
+.star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:tw 4s infinite ease-in-out}
+@keyframes tw{50%{opacity:.25}}
+.curtain{position:absolute;top:8%;width:11%;height:76%;background:linear-gradient(90deg,#2b2638,#3a3349 50%,#2b2638);opacity:.85;border-radius:0 0 30% 30%}
+.floor{position:absolute;left:0;right:0;bottom:0;height:18%;background:#0f0d16}
+.bed{position:absolute;left:6%;bottom:14%;width:min(44vw,520px);height:min(14vw,150px);background:#221e2e;border-radius:12px 12px 6px 6px}
+.bed::before{content:"";position:absolute;left:4%;top:-26%;width:24%;height:40%;background:#ece4d6;opacity:.18;border-radius:30px}
+.bed::after{content:"";position:absolute;left:30%;right:0;top:-8%;height:40%;background:#3a3046;border-radius:10px}
+.bag{position:absolute;left:52%;bottom:16%;width:min(7vw,74px);aspect-ratio:3/4;background:#5b1f2b;border-radius:10px 10px 6px 6px;opacity:.75}
+.entry-in{position:relative;z-index:2;text-align:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--hand);letter-spacing:.14em;font-size:.95rem;opacity:.75}
+.title{font-family:var(--display);font-weight:800;font-size:clamp(2.3rem,6.6vw,4.6rem);line-height:1.2;margin:.3em 0 .15em;letter-spacing:.04em}
+.title .nw{white-space:nowrap;display:inline-block}
+.title .dot{color:var(--garnet)}
+.en{font-family:var(--display);letter-spacing:.34em;font-size:clamp(.8rem,1.6vw,1rem);opacity:.6;text-transform:uppercase}
+.sleep-btn{margin-top:2.6rem;display:inline-flex;align-items:center;gap:.8rem;padding:.95rem 2rem;border-radius:999px;border:1px solid rgba(236,228,214,.45);background:rgba(236,228,214,.08);color:var(--moon);font-family:var(--display);font-size:1.15rem;letter-spacing:.15em;transition:background .3s,border-color .3s}
+.sleep-btn:hover{background:rgba(236,228,214,.16);border-color:var(--moon)}
+.sleep-btn svg{width:20px;height:20px}
+.sound-note{margin-top:1rem;font-size:.82rem;opacity:.55;font-family:var(--hand)}
+.skip-in{margin-top:.6rem;background:none;border:0;color:var(--moon);opacity:.5;font-size:.82rem;text-decoration:underline;text-underline-offset:3px}
+
+/* ===== 眠りの暗転 ===== */
+#sleep{position:fixed;inset:0;z-index:60;background:#000;color:#d9d2c4;display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity 1.4s}
+#sleep.on{opacity:1;pointer-events:auto}
+#sleep.wake{background:#fff;transition:background 1.6s,opacity 1.6s}
+.lines{font-family:var(--display);font-size:clamp(1rem,2.4vw,1.3rem);line-height:2.4;text-align:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lines p{margin:0;opacity:0;transform:translateY(6px);transition:opacity 1.2s,transform 1.2s}
+.lines p.on{opacity:1;transform:none}
+.lines p.out{opacity:0;transition:opacity .8s}
+.lines .voice{color:#3a3650}
+#sleep .skip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:none;border:1px solid rgba(217,210,196,.3);color:#d9d2c4;border-radius:999px;padding:.35rem 1rem;font-size:.8rem;opacity:.6}
+
+/* ===== 本編 ===== */
+#app{min-height:100vh;padding-bottom:110px;position:relative}
+#app::after{content:"";position:fixed;inset:0;pointer-events:none;background:#fff;opacity:calc(var(--forget) * .075);transition:opacity 1.2s;z-index:20}
+#app .page{filter:saturate(calc(1 - var(--forget) * .08));transition:filter 1.5s}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(238,241,243,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+body:not(.locked)::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--morning)}
+.top .wrap{display:flex;align-items:center;gap:1.2rem;min-height:60px}
+.brand{font-family:var(--display);font-weight:800;font-size:1.1rem;white-space:nowrap;color:var(--ink);text-decoration:none}
+.brand .dot{color:var(--garnet)}
+nav.tabs{display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;margin-left:auto;min-width:0}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{white-space:nowrap;text-decoration:none;color:var(--ink-soft);font-size:.92rem;padding:.4rem .8rem;border-radius:999px}
+nav.tabs a[aria-current="page"]{color:var(--ink);background:var(--sheet);box-shadow:inset 0 -2px 0 var(--garnet)}
+.view{padding-block:clamp(40px,7vw,80px)}
+.view[hidden]{display:none}
+.label{font-family:var(--hand);font-size:.85rem;letter-spacing:.18em;color:var(--mute);display:flex;align-items:center;gap:.8em}
+.label::before{content:"";width:28px;height:3px;background:repeating-linear-gradient(to right,var(--garnet) 0 8px,transparent 8px 14px)}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.6vw,2.3rem);line-height:1.5;margin:.4em 0 .9em;text-wrap:balance}
+.lead{font-size:1.06rem;max-width:36em}
+.lead p{margin:0 0 1.3em}
+.say{font-family:var(--hand);font-size:1.1rem;padding-left:1em;border-left:3px solid var(--aqua)}
+.voice-line{font-family:var(--display);color:var(--ink-soft)}
+.voice-line b{font-weight:500;color:var(--mute);margin-right:.4em}
+
+/* あらすじ */
+.story-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(28px,5vw,64px);align-items:start}
+.photo{background:#fff;padding:12px 12px 50px;box-shadow:0 14px 34px rgba(37,35,58,.16);position:relative;max-width:100%;margin:0}
+.photo img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover}
+.photo figcaption{position:absolute;left:0;right:0;bottom:11px;text-align:center;font-family:var(--hand);color:var(--ink-soft)}
+.photo::after{content:"";position:absolute;top:-13px;left:50%;width:86px;height:26px;margin-left:-43px;background:rgba(207,213,220,.7);transform:rotate(-3deg)}
+.tilt-l{transform:rotate(-2.5deg)}.tilt-r{transform:rotate(2.5deg)}
+
+/* 街 */
+.town{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:clamp(24px,4vw,48px);align-items:start}
+.map{position:relative;aspect-ratio:4/3;border-radius:6px;overflow:hidden;background:var(--sheet);box-shadow:0 14px 34px rgba(37,35,58,.12)}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;transform:translate(-50%,-50%);display:grid;place-items:center;gap:.1rem;background:none;border:0;padding:.2rem;color:var(--ink)}
+.pin .ico{width:clamp(38px,5.4vw,54px);height:clamp(38px,5.4vw,54px);border-radius:50%;background:var(--sheet);border:2px solid var(--ink);display:grid;place-items:center;font-size:clamp(1.1rem,2.4vw,1.5rem);box-shadow:0 4px 0 rgba(37,35,58,.18);transition:transform .2s}
+.pin span{white-space:nowrap;font-family:var(--hand);font-size:clamp(.72rem,1.4vw,.9rem);background:rgba(251,251,250,.85);padding:0 .4em;border-radius:4px}
+.pin:hover .ico{transform:translateY(-3px)}
+.pin[aria-pressed="true"] .ico{border-color:var(--garnet);box-shadow:0 0 0 4px rgba(184,50,74,.18),0 4px 0 rgba(37,35,58,.18)}
+.place{background:var(--sheet);border-radius:6px;padding:1.4rem 1.4rem 1.5rem;min-height:100%;box-shadow:0 14px 34px rgba(37,35,58,.08)}
+.place h3{font-family:var(--display);font-size:1.5rem;margin:0 0 .6rem}
+.place p{margin:0 0 1rem}
+.place .hint{font-family:var(--hand);color:var(--mute)}
+.place.dusk{background:linear-gradient(170deg,#fde2c2,#f4b98d 70%,#e79a7c);}
+
+/* 人物 */
+.cast{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(36px,6vw,80px)}
+.person{display:grid;gap:1.6rem;align-content:start}
+.person .photo{max-width:380px}
+.person h3{font-family:var(--display);font-size:1.6rem;margin:0;font-weight:700}
+.person h3 small{display:block;font-family:var(--hand);font-size:.85rem;color:var(--mute);letter-spacing:.15em;font-weight:400}
+.person p{margin:0 0 .8rem}
+.person .line{font-family:var(--hand);font-size:1.06rem;padding-left:1em}
+.person.jd .line{border-left:3px solid var(--garnet)}
+.person.tz .line{border-left:3px solid var(--tanz)}
+.person.tz h3 small{color:var(--tanz)}
+.tag{display:inline-flex;flex-direction:column;gap:.25rem;background:#fff;border:1.5px solid #b8ae9c;border-radius:6px;padding:.6rem .9rem .7rem;transform:rotate(-2deg);position:relative;margin-top:.6rem;max-width:100%}
+.tag::before{content:"";position:absolute;top:-11px;left:50%;width:30px;height:12px;margin-left:-15px;background:#b8ae9c;border-radius:3px 3px 0 0}
+.tag label{font-family:var(--hand);font-size:.75rem;letter-spacing:.3em;color:var(--mute)}
+.tag input{font-family:var(--hand);font-weight:600;font-size:1.35rem;border:0;border-bottom:1.5px dashed #b8ae9c;background:transparent;color:var(--ink);width:min(14em,64vw);padding:.05em 0;outline:none}
+.tag-note{font-family:var(--hand);color:var(--ink-soft);font-size:.92rem;min-height:1.8em;margin-top:.6rem}
+
+/* 遊び方 */
+.howto{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,6vw,72px)}
+.steps{list-style:none;padding:0;margin:0;display:grid;gap:1.3rem;counter-reset:s}
+.steps li{display:grid;grid-template-columns:2.4rem 1fr;gap:.8rem}
+.steps li::before{counter-increment:s;content:counter(s);font-family:var(--display);font-weight:800;font-size:1.6rem;color:var(--garnet);line-height:1.2}
+.steps b{display:block;font-weight:700}
+.steps span{color:var(--ink-soft);font-size:.95rem}
+.forget-tbl{background:var(--sheet);border-radius:6px;padding:1.2rem 1.3rem;box-shadow:0 14px 34px rgba(37,35,58,.08)}
+.forget-tbl h3{font-family:var(--display);font-size:1.25rem;margin:0}
+.forget-tbl>p{margin:.1rem 0 1rem;color:var(--mute);font-size:.9rem}
+.forget-tbl ol{list-style:none;margin:0;padding:0;display:grid;gap:.1rem}
+.forget-tbl li{display:grid;grid-template-columns:1.6rem 1fr;gap:.6rem;font-size:.9rem;line-height:1.7;border-radius:4px;padding:0 .3rem}
+.forget-tbl li i{font-style:normal;font-family:var(--display);color:var(--aqua);font-variant-numeric:tabular-nums}
+.forget-tbl li.now{background:rgba(184,50,74,.1)}
+.fine{font-size:.85rem;color:var(--mute);margin-top:1.4rem}
+
+/* 主題歌 */
+.song-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.3rem 1.2rem}
+.song-head h2{margin-bottom:0}
+.song-en{font-family:var(--display);color:var(--mute);letter-spacing:.2em;font-size:.9rem}
+.song-cap{font-family:var(--hand);color:var(--ink-soft);margin:.5rem 0 2rem}
+.lyrics{list-style:none;margin:0;padding:0;display:grid;gap:.2rem;max-width:40em}
+.lyrics button{display:block;width:100%;text-align:left;background:none;border:0;padding:.35rem .6rem;border-radius:6px;font-family:var(--display);font-size:1.05rem;color:var(--mute);transition:color .4s,background .4s}
+.lyrics button:hover{background:var(--sheet)}
+.lyrics button.cur{color:var(--ink);background:var(--sheet);box-shadow:inset 3px 0 0 var(--garnet)}
+.lyrics .gap{height:.9rem}
+
+/* ===== 下の帯:ステータスウィンドウ兼プレイヤー ===== */
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(37,35,58,.95);color:#ece9f2;padding-bottom:env(safe-area-inset-bottom,0px)}
+#dock[hidden]{display:none}
+.dock-in{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.9rem;align-items:center;min-height:68px;padding-block:.5rem}
+.pp{width:44px;height:44px;border-radius:50%;border:0;background:#ece9f2;color:var(--ink);display:grid;place-items:center}
+.pp svg{width:17px;height:17px}
+.dock-mid{min-width:0}
+.dock-lyric{font-family:var(--display);font-size:.98rem;min-height:1.6em;line-height:1.45}
+.dock-lyric>*{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock-lyric.idle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock-lyric .tr{font-family:var(--body);font-size:.78rem;color:#b9b6c8}
+.lyrics .tr{display:block;font-family:var(--body);font-size:.85rem;color:var(--mute);margin-top:.1rem}
+.lyrics .tr[hidden],.dock-lyric .tr[hidden]{display:none}
+.kara span{display:inline-block;white-space:pre;transition:color .18s,text-shadow .3s}
+.kara span{--pop:#ff6b81}
+.dock-lyric .kara span,.lyrics button.cur .kara span{will-change:transform;backface-visibility:hidden}
+.lyrics .kara span{--pop:#c4394f}
+.dock-lyric .kara{padding-top:.4em;margin-top:-.4em}
+.kara.enter span{animation:drop .45s cubic-bezier(.2,1.4,.5,1) backwards;animation-delay:calc(var(--k) * 16ms)}
+@keyframes drop{from{opacity:0;transform:translateY(.25em) scale(.9)}}
+@keyframes hop{0%{transform:none}35%{transform:translateY(-.19em) scale(1.11);color:var(--pop)}70%{transform:translateY(.02em) scale(.985)}100%{transform:none}}
+.dock-lyric .kara span{color:#8f8ca3}
+.dock-lyric .kara span.lit{color:#7fd0ea}
+.dock-lyric.held .kara span{color:#8f8ca3;text-shadow:none}
+@keyframes lyrIn{from{opacity:0;transform:translateY(6px)}}
+.lyrics button.cur .kara span{color:var(--mute)}
+.lyrics button.cur .kara span.lit{color:#1f86a8}
+.lyrics button.held .kara span{color:var(--mute)}
+.kara span.lit{animation:hop .42s cubic-bezier(.3,1.5,.5,1)}
+.dock-lyric.held .kara span.lit,.lyrics button.held .kara span.lit{animation:none}
+#entry{background:#0e1020 url(img/entry.webp) 70% center/cover no-repeat}
+#entry::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(12,12,24,.9) 0%,rgba(12,12,24,.72) 28%,rgba(12,12,24,.18) 55%,rgba(12,12,24,0) 72%)}
+#entry .room{display:none}
+@media (min-width:761px){#entry .entry-in{max-width:42vw}#entry .title{font-size:clamp(2.2rem,4.6vw,3.6rem)}}
+@media (max-width:760px){#entry{background-position:74% center}#entry::before{background:linear-gradient(180deg,rgba(12,12,24,.5) 0%,rgba(12,12,24,.78) 45%,rgba(12,12,24,.6) 100%)}}
+.cta{display:inline-flex;align-items:center;gap:.6rem;margin-top:1.6rem;padding:.75rem 1.5rem;border-radius:999px;background:var(--ink);color:var(--sheet);text-decoration:none;font-family:var(--display);letter-spacing:.08em}
+.cta:hover{background:var(--garnet)}
+.cta svg{width:14px;height:14px}
+.backbtn{background:none;border:1px solid var(--line);border-radius:999px;color:var(--ink-soft);font-size:.8rem;padding:.25rem .7rem;white-space:nowrap;display:inline-flex;align-items:center;gap:.35rem;flex:none}
+.backbtn svg{width:13px;height:13px}
+footer a{color:var(--ink)}
+.dock-lyric.idle{color:#a8a5b8;font-family:var(--hand)}
+.bar{position:relative;height:16px;cursor:pointer;touch-action:none;margin-top:.1rem}
+.bar::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:rgba(236,233,242,.2)}
+.bar .fill{position:absolute;left:0;top:7px;height:2px;width:0;background:repeating-linear-gradient(to right,#e0566c 0 7px,transparent 7px 11px)}
+.status{display:flex;align-items:center;gap:.6rem;font-size:.85rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.status .sw{background:rgba(255,255,255,.08);border-radius:6px;padding:.25rem .6rem}
+.remember{background:none;border:1px solid rgba(236,233,242,.4);color:#ece9f2;border-radius:999px;padding:.2rem .8rem;font-size:.8rem}
+.remember[hidden]{display:none}
+#blank{position:fixed;inset:0;z-index:45;display:grid;place-items:center;text-align:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#blank[hidden]{display:none}
+#blank p{font-family:var(--display);font-size:clamp(1.1rem,2.6vw,1.5rem);color:var(--ink-soft);margin:0 0 1.4rem}
+#blank button{border:1px solid var(--ink);background:var(--sheet);color:var(--ink);border-radius:999px;padding:.6rem 1.6rem;font-family:var(--display)}
+footer{padding-block:40px;border-top:1px solid var(--line);font-size:.85rem;color:var(--mute)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem}
+
+@media (min-width:761px){#entry{place-items:center start}.entry-in{text-align:left;margin-left:7vw}}
+@media (max-width:760px){
+  .story-grid,.town,.cast,.howto{grid-template-columns:minmax(0,1fr)}
+  .story-grid .photo{max-width:300px}
+  .brand{display:none}
+  nav.tabs{margin-left:0}
+  .status .where{display:none}
+  .backbtn span{display:none}
+  .backbtn{padding:.35rem .5rem}
+  .win{width:58vw;right:-6%;top:6%}
+  .bed{width:70vw}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+html[lang="ko"]{--display:"Noto Serif KR","Nanum Myeongjo",serif;--hand:"Gowun Dodum","Noto Sans KR",sans-serif;--body:"Noto Sans KR","Malgun Gothic",sans-serif}
+html[lang="zh-Hant"]{--display:"Noto Serif TC","PMingLiU",serif;--hand:"Noto Sans TC",sans-serif;--body:"Noto Sans TC","Microsoft JhengHei",sans-serif}
+html[lang="zh-Hans"]{--display:"Noto Serif SC","SimSun",serif;--hand:"Noto Sans SC",sans-serif;--body:"Noto Sans SC","Microsoft YaHei",sans-serif}
+html[lang="en"]{--display:"Shippori Mincho B1",Georgia,serif;--hand:"Klee One",sans-serif;--body:"Zen Kaku Gothic New",system-ui,sans-serif}
+html[lang="en"] .title{letter-spacing:.01em}
+html[lang="en"] [data-t="t2"],html[lang="ko"] [data-t="t2"]{margin-left:.28em}
+html[lang="en"] .title [data-t="t2"],html[lang="ko"] .title [data-t="t2"]{margin-left:0}
+html[lang="en"] .title [data-t="t1"]::after,html[lang="ko"] .title [data-t="t1"]::after{content:"\00a0"}
+/* 言語 */
+.langs{display:flex;gap:.15rem;flex-wrap:nowrap}
+.langs button{background:none;border:0;padding:.25rem .45rem;border-radius:4px;font-size:.78rem;letter-spacing:.06em;color:inherit;opacity:.55}
+.langs button[aria-pressed="true"]{opacity:1;box-shadow:inset 0 -2px 0 var(--garnet)}
+.entry-langs{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));z-index:3;color:var(--moon)}
+.top .langs{color:var(--ink);flex:none}
+/* 崩れる */
+.sand{display:inline-block;white-space:pre}
+.sandw{display:inline-block;white-space:nowrap}
+.crumble .sand{animation:sand 1.3s cubic-bezier(.55,0,.8,.4) forwards;animation-delay:var(--d)}
+@keyframes sand{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0;filter:blur(2px)}}
+.crumble .dust{animation:dust 1.6s ease-in forwards;animation-delay:var(--d)}
+@keyframes dust{to{transform:translateY(40px) scale(.98);opacity:0;filter:blur(10px) saturate(0)}}
+.fadeout{transition:opacity 1.6s 1.4s,filter 1.6s 1.4s!important;opacity:0!important;filter:blur(6px)}
+#blank{background:#fff;opacity:0;transition:opacity 1s}
+#blank.show{opacity:1}
+#blank p,#blank button{opacity:0;transform:translateY(6px);transition:opacity 1.4s,transform 1.4s}
+#blank.show p{opacity:1;transform:none;transition-delay:.6s}
+#blank.show button{opacity:1;transform:none;transition-delay:1.8s}
+</style>
+</head>
+<body>
+
+<div id="entry">
+  <div class="langs entry-langs" role="group" aria-label="Language"></div>
+  <div class="room" aria-hidden="true">
+    <div class="curtain" style="right:calc(8% + min(38vw,420px) - 2%)"></div>
+    <div class="win"><div class="moon"></div></div>
+    <div class="curtain" style="right:4%"></div>
+    <div class="floor"></div><div class="bed"></div><div class="bag"></div>
+  </div>
+  <div class="entry-in">
+    <div class="eyebrow" data-t="eyebrow"></div>
+    <h1 class="title"><span class="nw" data-t="t1"></span><span class="nw" data-t="t2"></span></h1>
+    <div class="en" data-t="sub"></div>
+    <button class="sleep-btn" id="sleepBtn" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M13.5 2.5a7.5 7.5 0 1 0 4 13.4A8 8 0 0 1 13.5 2.5z" fill="currentColor"/></svg><span data-t="btn"></span></button>
+    <div class="sound-note" data-t="sound"></div>
+    <button class="skip-in" id="quietBtn" type="button" data-t="quiet"></button>
+  </div>
+</div>
+
+<div id="sleep" aria-live="polite">
+  <div class="lines" id="lines"><p></p><p></p><p></p><p></p><p></p></div>
+  <button class="skip" id="skipBtn" type="button" data-t="skip"></button>
+</div>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="#story"><span data-t="t1"></span><span data-t="t2"></span></a>
+      <nav class="tabs" aria-label="Pages">
+        <a href="#story" data-tab="0"></a><a href="#town" data-tab="1"></a><a href="#cast" data-tab="2"></a><a href="#howto" data-tab="3"></a><a href="#song" data-tab="4"></a>
+      </nav>
+      <div class="langs" role="group" aria-label="Language"></div>
+      <button class="backbtn" type="button" id="backBtn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M13.5 2.5a7.5 7.5 0 1 0 4 13.4A8 8 0 0 1 13.5 2.5z" fill="currentColor"/></svg><span data-t="back"></span></button>
+    </div>
+  </header>
+
+  <div class="page">
+  <section class="view" data-view="story">
+    <div class="wrap story-grid">
+      <div>
+        <div class="label" data-t-tab="0"></div>
+        <h2 data-t="st_h"></h2>
+        <div class="lead">
+          <p class="voice-line"><b>「　　」</b><span data-t="st_v1"></span></p>
+          <p data-t="st_p1"></p>
+          <p class="say" data-t="st_say"></p>
+          <p class="voice-line"><b>「　　」</b><span data-t="st_v2"></span></p>
+          <p data-t="st_p2"></p>
+          <p data-t="st_p3"></p>
+        </div>
+        <a class="cta ec-link" target="_blank" rel="noopener"><span data-t="play_ec"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3h7v7M13 3L4 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></a>
+      </div>
+      <figure class="photo tilt-r"><img src="img/girl.webp" alt="" width="900" height="900"><figcaption class="jd-cap"></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="view" data-view="town" hidden>
+    <div class="wrap">
+      <div class="label" data-t-tab="1"></div>
+      <h2 data-t="tw_h"></h2>
+      <div class="town">
+        <div class="map" id="map">
+          <svg viewBox="0 0 400 300" aria-hidden="true">
+            <rect width="400" height="300" fill="#fbfbfa"/>
+            <path d="M0 220 Q90 205 170 232 T320 238 Q360 236 400 222 L400 300 L0 300Z" fill="#f3c9a2"/>
+            <path d="M0 246 Q90 232 170 256 T320 262 Q360 260 400 248 L400 300 L0 300Z" fill="#e9a57f"/>
+            <path d="M0 268 Q110 258 200 276 T400 270 L400 300 L0 300Z" fill="#d98e74"/>
+            <g fill="none" stroke="#cfd5dc" stroke-width="7" stroke-linecap="round"><path d="M40 70 L130 110 L250 92 L350 60"/><path d="M130 110 L150 180 L240 214"/><path d="M250 92 L262 168 L240 214"/></g>
+            <g fill="none" stroke="#b8324a" stroke-width="2" stroke-dasharray="6 5" stroke-linecap="round"><path d="M70 82 L130 110 L250 92"/></g>
+            <g fill="#d9e3dc"><circle cx="190" cy="40" r="14"/><circle cx="210" cy="34" r="11"/><circle cx="316" cy="140" r="12"/><circle cx="60" cy="160" r="15"/><circle cx="78" cy="170" r="10"/></g>
+            <g fill="#e2e7ec"><rect x="92" y="28" width="26" height="20"/><rect x="290" y="96" width="22" height="18"/><rect x="180" y="132" width="24" height="20"/><rect x="40" y="110" width="20" height="16"/></g>
+          </svg>
+          <button class="pin" type="button" data-place="home" style="left:17%;top:27%"><div class="ico">🏠</div><span></span></button>
+          <button class="pin" type="button" data-place="park" style="left:42%;top:59%"><div class="ico">🛝</div><span></span></button>
+          <button class="pin" type="button" data-place="school" style="left:62%;top:28%"><div class="ico">🏫</div><span></span></button>
+          <button class="pin" type="button" data-place="library" style="left:86%;top:21%"><div class="ico">📚</div><span></span></button>
+          <button class="pin" type="button" data-place="beach" style="left:66%;top:83%"><div class="ico">🌊</div><span></span></button>
+        </div>
+        <article class="place" id="place" aria-live="polite"></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" data-view="cast" hidden>
+    <div class="wrap">
+      <div class="label" data-t-tab="2"></div>
+      <h2 data-t="ca_h"></h2>
+      <div class="cast">
+        <article class="person jd">
+          <figure class="photo tilt-l"><img src="img/girl.webp" alt="" width="900" height="900"><figcaption class="jd-cap"></figcaption></figure>
+          <div>
+            <h3><small data-t="jd_s"></small><span class="jd-name"></span></h3>
+            <p data-t="jd_d"></p>
+            <p class="line" data-t="jd_l"></p>
+            <div class="tag"><label for="nameInput" data-t="tag"></label><input id="nameInput" type="text" maxlength="16" autocomplete="off" aria-describedby="tagNote"></div>
+            <p class="tag-note" id="tagNote"></p>
+          </div>
+        </article>
+        <article class="person tz">
+          <figure class="photo tilt-r"><img src="img/tanzanite.webp" alt="" width="900" height="900"><figcaption data-t="tz_c"></figcaption></figure>
+          <div>
+            <h3><small data-t="tz_s"></small><span data-t="tz_n"></span></h3>
+            <p data-t="tz_d"></p>
+            <p class="line" data-t="tz_l"></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" data-view="howto" hidden>
+    <div class="wrap">
+      <div class="label" data-t-tab="3"></div>
+      <h2 data-t="ho_h"></h2>
+      <div class="howto">
+        <div>
+          <ol class="steps" id="steps"></ol>
+          <p class="fine" data-t="fine"></p>
+          <a class="cta ec-link" target="_blank" rel="noopener"><span data-t="play_ec"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3h7v7M13 3L4 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></a>
+        </div>
+        <div class="forget-tbl">
+          <h3 data-t="fg_h"></h3>
+          <p id="fgP"></p>
+          <ol id="forgetList"></ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" data-view="song" hidden>
+    <div class="wrap">
+      <div class="label" data-t-tab="4"></div>
+      <div class="song-head"><h2>ジェーン・ドゥから、あなたへ</h2><span class="song-en">From Jane Doe, to You</span></div>
+      <p class="song-cap"><span data-t="so_cap"></span> <span class="fine" data-t="so_note"></span></p>
+      <ol class="lyrics" id="lyricList"></ol>
+    </div>
+  </section>
+  </div>
+
+  <footer><div class="wrap"><div><b><span data-t="t1"></span><span data-t="t2"></span></b><br><span data-t="sub"></span></div><div><a class="ec-link" target="_blank" rel="noopener" data-t="play_ec"></a><br><span data-t="ft2"></span></div></div></footer>
+</div>
+
+<div id="dock" hidden>
+  <div class="wrap dock-in">
+    <button class="pp" id="pp" type="button"><svg id="ppIcon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg></button>
+    <div class="dock-mid">
+      <div class="dock-lyric idle" id="dockLyric"></div>
+      <div class="bar" id="bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="265" aria-valuenow="0"><div class="fill" id="fill"></div></div>
+    </div>
+    <div class="status"><span class="sw"><span class="where" id="where"></span><span data-t="fgw"></span> <b id="fNow">0</b>/9</span><button class="remember" id="rememberBtn" type="button" hidden data-t="rem"></button></div>
+  </div>
+</div>
+
+<div id="blank" hidden><div><p data-t="blank"></p><button type="button" id="blankBtn" data-t="rem"></button></div></div>
+
+<audio id="au" src="audio/song.mp3" preload="auto"></audio>
+
+<script src="kara.js"></script>
+<script>
+const LYR=[
+ [16.2,[9.0,'十分に知っていたんだ'],[13.0,'ありがたい事だって']],
+ [27.0,[16.5,'それをただ'],[18.5,'考えてみたことが'],[22.2,'無かっただけで']],
+ [43.4,[40.09,'一歩一歩'],[41.25,'進み続ける人生で']],
+ [47.15,[43.55,'置いて来た'],[45.35,'物の全てを']],
+ [50.85,[47.3,'数えてなんて'],[49.0,'いられないけど']],
+ [55.35,[51.0,'一つ一つ'],[52.6,'秒針が進み続ける']],
+ [58.8,[55.5,'止まる事が'],[57.5,'出来ない日々で']],
+ [62.9,[58.95,'幾つのことを'],[60.65,'過去にしただろう']],
+ [66.95,[63.07,'好きだった物語'],[65.0,'ボロボロの'],[66.0,'ぬいぐるみ']],
+ [73.4,[67.05,'いつの間にか'],[68.1,'手放してきた'],[69.2,'小さな思い出']],
+ [78.55,[74.5,'ガラスで出来た'],[76.5,'靴に憧れ']],
+ [82.3,[78.7,'子猫に贈る長靴探し']],
+ [86.0,[82.5,'雪の女王を'],[84.3,'怖がるあまりに']],
+ [89.75,[86.17,'大切なあなたを'],[88.1,'抱きしめたの']],
+ [93.7,[89.9,'それでもあなたを'],[92.15,'私のもとから']],
+ [97.4,[93.87,'連れ去ってしまったのは']],
+ [106.4,[97.65,'流れ続ける'],[101.75,'時間だったね']],
+ [110.8,[107.53,'一期一会　またすれ違う世の中で']],
+ [114.8,[111.0,'見送った　ものの全てを']],
+ [118.9,[115.0,'覚えてなんて　いられないけど']],
+ [122.9,[119.1,'一段ずつ　階段　のぼり続ける']],
+ [126.3,[123.1,'降りる事が出来ない舞台で']],
+ [130.4,[126.5,'幾つのことを　諦めただろう']],
+ [134.3,[130.8,'繰り返し本を捲る　色褪せた　刺繍糸']],
+ [141.8,[134.5,'振り返れば'],[135.8,'心に残る'],[137.28,'大事な思い出']],
+ [146.2,[142.7,'ガラスで出来た靴を探し']],
+ [149.9,[146.38,'子猫に贈る長靴買って']],
+ [154.0,[150.1,'雪の女王を真っすぐ'],[152.75,'見詰めて']],
+ [157.7,[154.1,'ゲルダの涙は必要ないかな']],
+ [164.0,[157.9,'連れ立っては行けないけど']],
+ [171.6,[164.8,'それで良いもの此処に居るから']],
+ [180.5,[173.1,'ふと足を止めた'],[176.5,'帰り道の交差点']],
+ [187.5,[180.8,'懐かしい匂いに'],[182.9,'わけもなく胸が痛んだ']],
+ [195.6,[188.0,'名前も顔も'],[191.87,'もう思い出せないけど']],
+ [204.5,[195.85,'そこに確かに'],[198.5,'残っていたから']],
+ [211.9,[208.0,'ガラスの靴は履けなかったね']],
+ [215.9,[212.08,'長靴の猫は旅に出たね']],
+ [219.4,[216.12,'雪の女王の'],[217.73,'お城を越えて']],
+ [223.25,[219.53,'あなたは'],[220.95,'ちゃんと大人になった']],
+ [227.0,[223.39,'忘れたことさえ'],[225.34,'忘れたままで']],
+ [230.85,[227.11,'振りかえらないで'],[229.22,'歩いていって']],
+ [240.4,[231.0,'流れ続ける'],[235.0,'時間の向こうへ']],
+ [248.1,[241.4,'十分に知っていたんだ'],[245.2,'大切だったことを']],
+ [259.3,[248.3,'それをただ　振り返ったことが'],[255.0,'無かっただけで']],
+];
+const I18N={
+ja:{_name:'JP',play_ec:'EdenChatで遊ぶ',back:'最初に戻る',lang:'ja',eyebrow:'EdenChat ／ 一人用ホラー・ドラマ',t1:'ジェーン・ドゥの',t2:'怪物',sub:'The Jane Doe Monster',btn:'今日を終える',sound:'押すと、主題歌が流れます。',quiet:'音を出さずに入る',
+ sl:['いつも通りの今日を過ごして、今日を終える頃。','もう何度帰ってきたのか分からない自分の家で、ベッドに潜り込んで横になる。','疲れからか、すぐに眠気に襲われる。','……。','…………。'],skip:'飛ばす',
+ tabs:['あらすじ','街','登場人物','遊び方','主題歌'],
+ st_h:'目を覚ますと、そこは子供の頃の自分の部屋だった。',st_v1:'陽の光が瞼を差して、あなたは目を覚まします。',st_p1:'階下からはテレビの音。食卓には、湯気の立つ朝ご飯が並んでいる。そしてキッチンの陰から、見覚えのない少女がこちらを窺っていた。',st_say:'「おはようございます……！ ご飯、どうでしたか？」',st_v2:'あなたはその少女を知っているでしょう。いつでも、あなたの傍にいた少女が彼女です。',st_p2:'少女はあなたの幼馴染だと言う。あなたが忘れてしまった思い出を、ひとつずつ思い出してほしいのだと。',st_p3:'懐かしい街をめぐる、一日だけのお出掛け。けれど歩くほどに、何かを少しずつ忘れていく気がする。',noname:'（なまえのない女の子）',
+ tw_h:'あなたが覚えている街。',tw_t:'行き先を選ぶ',tw_hint:'地図の場所を押すと、そこへ向かいます。歩くたびに、少しずつ忘れていきます。',
+ pl:{home:['自宅','子供の頃に過ごした家。朝食の湯気と、つけっぱなしのテレビ。本棚には、色々な童話の絵本が詰め込まれている。両親の部屋の扉だけは、いつも鍵が掛かっている。','あなたの家です。少女とあなたとで過ごした日々が、思い出すまでも無く、残されていることでしょう。'],park:['公園','滑り台と砂場とブランコだけの、小さな公園。誰もいない。家からここまでの道にも、誰もいなかった。','もう一度だけ。もう一度だけ、滑り台を滑り降りてみて下さい。'],school:['学校','門を閉ざした古い校舎。少し無茶をすれば乗り越えられる。教室は夕暮れの斜陽に照らされて、どの机も思っていたより小さい。','いつも隣の席に、少女は居ました。'],library:['図書館','少し遠くに見える、大きな建物。中は外観からは想像もつかないほど広く、どの本にもタイトルがない。少女は「用事がある」と言って、ここへは一緒に来ない。','大きな建物の内に秘められた知識は、見方によっては高潔な墓標でもあるのかもしれません。'],beach:['海岸','いつ訪れても、夕暮れの海。砂浜には足跡ひとつない。少女は「あそこは……最後にしませんか」と言う。',null,'君はこの場所を知らない。知らないが、覚えている。']},
+ ca_h:'この街にいるのは、ふたりだけ。',jd_s:'あなたの幼馴染',jd_n:'少女',jd_d:'あなたの傍にずっといたと言う、友好的で少し不安げな少女。大きすぎるカーディガンは借り物で、胸の名札には何も書かれていない。名前は、あなたが思い出して呼んでくれるまで、まだ無い。',jd_l:'「思い出して、欲しくて……。駄目、でしょうか……。」',tag:'なまえ',tag0:'彼女の名前を、あなたは知っているはずです。',tag1:'「{n}……。はい、そうです。思い出してくれたんですね……！」',tag2:'……あれ、なんて名前だったっけ。',
+ tz_s:'図書館の司書を名乗る男',tz_n:'タンザナイト',tz_d:'果てしなく本の並ぶ図書館で、あなたを待っていた男。皮肉屋で面倒くさがり、感情の読めない笑みを崩さない。外套に下げた鍵が、どこの扉のものかは分からない。',tz_l:'「心配するなよ。私はお前を助けに来たんだ。」',tz_c:'司書さん',
+ ho_h:'あなたの一日を、あなたが選ぶ。',steps:[['ペルソナに三つだけ書いておく','性別（少女からの呼び方が変わります）、好きな宝石、子供の頃に得意だった教科。書いていなければ、始めに聞かれます。'],['少女と街をめぐる','どこへ行くか、何を調べるか、少女とどう話すか。ちゃんと探せば、何かが見付かるかもしれません。'],['思い出を語る','あなたが「思い出した」と語った思い出は、この夢の中では本当になります。'],['結末を選ぶ','一日の終わりに、夜の海岸へ。結末はひとつではありません。']],fine:'一人用・テキストのみで遊べます。成人向けの表現を含みます。',
+ fg_h:'忘却',fg_p:'この街にいるだけで、記憶は少しずつ失われていく。今のあなたは {n}。',fg:['異常はない','何かを忘れた事に気付かない。殆ど異常はない。','幼少期等の古い記憶を思い出しづらい。','重要ではない記憶に靄が掛かったように感じる。','多くの記憶が朧気に感じる。咄嗟に自分の過去を思い出すことが出来ない。','幾つかの重要な記憶に靄が掛かったように感じる。違和感を覚える。','多くの記憶が欠落する。強い違和感と危機感を覚える。','重要ではない記憶が完全に欠落する。','自身を構成する大切な記憶が欠落する。大きな焦燥感と恐怖を覚える。','自分に過去はない。あり得ないかもしれないが、白紙だ。'],
+ so_cap:'忘れられたすべてから',so_note:'',dock0:'主題歌「ジェーン・ドゥから、あなたへ」',fgw:'忘却',rem:'思い出す',blank:'自分に過去は無い。……白紙だ。',ft1:'EdenChat にて公開予定',ft2:'成人向けの表現を含みます',play:'再生',pause:'一時停止',moji:'縺繧譁蟄鬘髢蜷荳螟髱逕豁謌莉'},
+ko:{_name:'KR',play_ec:'EdenChat에서 플레이',back:'처음으로',lang:'ko',eyebrow:'EdenChat ／ 1인용 호러 드라마',t1:'제인 도의',t2:'괴물',sub:'ジェーン・ドゥの怪物',btn:'오늘을 끝낸다',sound:'누르면 주제가가 흐릅니다.',quiet:'소리 없이 들어가기',
+ sl:['평소와 다름없는 오늘을 보내고, 오늘을 끝낼 무렵.','몇 번이나 돌아왔는지 모를 내 집에서, 침대에 파고들어 눕는다.','피곤해서인지, 금세 졸음이 몰려온다.','…….','………….'],skip:'건너뛰기',
+ tabs:['줄거리','거리','등장인물','플레이 방법','주제가'],
+ st_h:'눈을 뜨자, 그곳은 어린 시절의 내 방이었다.',st_v1:'눈꺼풀에 햇살이 비치고, 당신은 잠에서 깨어납니다.',st_p1:'아래층에서는 텔레비전 소리. 식탁에는 김이 오르는 아침밥이 차려져 있다. 그리고 부엌 그늘에서, 낯선 소녀가 이쪽을 살피고 있었다.',st_say:'「좋은 아침이에요……! 밥, 어땠나요?」',st_v2:'당신은 그 소녀를 알고 있을 겁니다. 언제나 당신 곁에 있던 소녀가 바로 그녀입니다.',st_p2:'소녀는 자신이 당신의 소꿉친구라고 한다. 당신이 잊어버린 추억을, 하나씩 다시 떠올려 주었으면 한다고.',st_p3:'그리운 거리를 도는, 단 하루의 외출. 하지만 걸을수록, 무언가를 조금씩 잊어 가는 것 같다.',noname:'（이름 없는 여자아이）',
+ tw_h:'당신이 기억하는 거리.',tw_t:'갈 곳을 고른다',tw_hint:'지도의 장소를 누르면 그곳으로 향합니다. 걸을 때마다 조금씩 잊어 갑니다.',
+ pl:{home:['집','어린 시절을 보낸 집. 아침밥의 김과 켜 둔 채인 텔레비전. 책장에는 온갖 동화 그림책이 빼곡하다. 부모님 방의 문만은 언제나 잠겨 있다.','당신의 집입니다. 소녀와 당신이 함께 보낸 나날이, 떠올릴 필요도 없이 남아 있겠지요.'],park:['공원','미끄럼틀과 모래밭과 그네뿐인 작은 공원. 아무도 없다. 집에서 여기까지 오는 길에도, 아무도 없었다.','한 번만 더. 한 번만 더, 미끄럼틀을 미끄러져 내려와 보세요.'],school:['학교','문을 닫아건 낡은 교사. 조금 무리하면 넘어갈 수 있다. 교실은 저녁 햇살에 물들어 있고, 어느 책상이든 생각보다 작다.','언제나 옆자리에는 소녀가 있었습니다.'],library:['도서관','조금 멀리 보이는 커다란 건물. 안은 겉모습으로는 상상도 못 할 만큼 넓고, 어느 책에도 제목이 없다. 소녀는 「볼일이 있다」며 이곳에는 함께 오지 않는다.','커다란 건물 안에 간직된 지식은, 보기에 따라서는 고결한 묘비일지도 모릅니다.'],beach:['해안','언제 찾아가도 해 질 녘의 바다. 모래사장에는 발자국 하나 없다. 소녀는 「거기는…… 마지막으로 하지 않을래요?」라고 말한다.',null,'너는 이곳을 모른다. 모르지만, 기억하고 있다.']},
+ ca_h:'이 거리에 있는 것은, 단 둘뿐.',jd_s:'당신의 소꿉친구',jd_n:'소녀',jd_d:'당신 곁에 줄곧 있었다고 말하는, 다정하고 조금 불안해 보이는 소녀. 너무 큰 카디건은 빌린 것이고, 가슴의 명찰에는 아무것도 적혀 있지 않다. 이름은, 당신이 떠올려 불러 줄 때까지 아직 없다.',jd_l:'「떠올려 줬으면 해서……. 안 될까요……?」',tag:'이름',tag0:'그녀의 이름을, 당신은 알고 있을 겁니다.',tag1:'「{n}……. 네, 맞아요. 떠올려 주셨군요……!」',tag2:'……어라, 이름이 뭐였더라.',
+ tz_s:'도서관 사서를 자칭하는 남자',tz_n:'탄자나이트',tz_d:'끝없이 책이 늘어선 도서관에서 당신을 기다리던 남자. 비꼬기 좋아하고 귀찮음이 많으며, 속을 알 수 없는 미소를 무너뜨리지 않는다. 외투에 매단 열쇠가 어느 문의 것인지는 알 수 없다.',tz_l:'「걱정 마. 나는 너를 도우러 왔어.」',tz_c:'사서 씨',
+ ho_h:'당신의 하루를, 당신이 고른다.',steps:[['페르소나에 세 가지만 적어 둔다','성별(소녀가 부르는 호칭이 달라집니다), 좋아하는 보석, 어린 시절 잘했던 과목. 적지 않았다면 처음에 물어봅니다.'],['소녀와 거리를 돈다','어디로 갈지, 무엇을 조사할지, 소녀와 어떻게 이야기할지. 제대로 찾으면, 무언가가 발견될지도 모릅니다.'],['추억을 이야기한다','당신이 「떠올렸다」고 말한 추억은, 이 꿈속에서는 진짜가 됩니다.'],['결말을 고른다','하루가 끝날 무렵, 밤의 해안으로. 결말은 하나가 아닙니다.']],fine:'1인용・텍스트만으로 플레이할 수 있습니다. 성인 대상 표현이 포함되어 있습니다.',
+ fg_h:'망각',fg_p:'이 거리에 있는 것만으로, 기억은 조금씩 사라져 간다. 지금의 당신은 {n}.',fg:['이상 없음','무언가를 잊었다는 것을 깨닫지 못한다. 거의 이상 없음.','유년기 등의 오래된 기억이 잘 떠오르지 않는다.','중요하지 않은 기억에 안개가 낀 것처럼 느껴진다.','많은 기억이 흐릿하게 느껴진다. 순간적으로 자신의 과거를 떠올리지 못한다.','몇몇 중요한 기억에 안개가 낀 것처럼 느껴진다. 위화감을 느낀다.','많은 기억이 빠져나간다. 강한 위화감과 위기감을 느낀다.','중요하지 않은 기억이 완전히 사라진다.','자신을 이루는 소중한 기억이 사라진다. 커다란 초조함과 공포를 느낀다.','내게 과거는 없다. 있을 수 없는 일일지도 모르지만, 백지다.'],
+ so_cap:'잊힌 모든 것으로부터',so_note:'일본어 가사에 번역을 덧붙였습니다.',dock0:'주제가「ジェーン・ドゥから、あなたへ」',fgw:'망각',rem:'떠올린다',blank:'내게 과거는 없다. ……백지다.',ft1:'EdenChat에서 공개 예정',ft2:'성인 대상 표현이 포함되어 있습니다',play:'재생',pause:'일시정지',moji:'뷁뛟꿻쀍뙡쉛뀕휅똠쁣'},
+tw:{_name:'TW',play_ec:'在 EdenChat 遊玩',back:'回到開頭',lang:'zh-Hant',eyebrow:'EdenChat ／ 單人恐怖劇',t1:'珍・杜的',t2:'怪物',sub:'ジェーン・ドゥの怪物',btn:'結束今天',sound:'按下後會播放主題曲。',quiet:'不播放聲音進入',
+ sl:['度過一如往常的今天，在今天即將結束時。','在不知道已經回來過多少次的自己家裡，鑽進被窩躺下。','大概是累了，睡意很快襲來。','……。','…………。'],skip:'略過',
+ tabs:['故事大綱','街道','登場人物','遊玩方式','主題曲'],
+ st_h:'醒來時，那裡是兒時自己的房間。',st_v1:'陽光照在眼皮上，你醒了過來。',st_p1:'樓下傳來電視的聲音。餐桌上擺著冒著熱氣的早餐。然後，一個沒見過的少女正從廚房的陰影裡窺視著這邊。',st_say:'「早安……！早餐，還合口味嗎？」',st_v2:'你應該認識那個少女。一直待在你身邊的少女，就是她。',st_p2:'少女說她是你的青梅竹馬。她希望你能把遺忘的回憶，一個一個想起來。',st_p3:'走遍懷念街道的、僅僅一天的出遊。然而越是走著，越覺得自己正一點一點地忘記什麼。',noname:'（沒有名字的女孩）',
+ tw_h:'你所記得的街道。',tw_t:'選擇目的地',tw_hint:'按下地圖上的地點，就會前往那裡。每走一步，都會忘記一點。',
+ pl:{home:['自宅','兒時度過的家。早餐的熱氣，開著沒關的電視。書架上塞滿了各種童話繪本。只有父母房間的門，總是上著鎖。','這是你的家。少女與你一起度過的日子，不必回想，也一定還留在這裡。'],park:['公園','只有溜滑梯、沙坑和鞦韆的小公園。一個人也沒有。從家裡到這裡的路上，也一個人都沒有。','再一次就好。請再一次，從溜滑梯上滑下來。'],school:['學校','大門緊閉的老舊校舍。稍微勉強一下就能翻過去。教室被夕陽染紅，每張桌子都比記憶中還小。','少女總是坐在你隔壁的座位。'],library:['圖書館','遠處看得見的一棟大建築。裡面寬廣得難以從外觀想像，每本書都沒有標題。少女說「有點事」，沒有跟著一起來。','封存在巨大建築裡的知識，換個角度看，或許也是高潔的墓碑。'],beach:['海岸','無論何時造訪，都是黃昏的海。沙灘上連一個腳印都沒有。少女說：「那裡……留到最後好嗎？」',null,'你不知道這個地方。不知道，卻記得。']},
+ ca_h:'這條街上，只有兩個人。',jd_s:'你的青梅竹馬',jd_n:'少女',jd_d:'說自己一直待在你身邊、友善又有些不安的少女。過大的開襟毛衣是借來的，胸前的名牌上什麼也沒寫。在你想起並呼喚她之前，她還沒有名字。',jd_l:'「因為，想要你想起來……。不行嗎……？」',tag:'名字',tag0:'她的名字，你應該知道。',tag1:'「{n}……。是的，沒錯。你想起來了呢……！」',tag2:'……咦，她叫什麼名字來著。',
+ tz_s:'自稱圖書館管理員的男人',tz_n:'坦桑石',tz_d:'在書架無盡延伸的圖書館裡等著你的男人。愛挖苦人又怕麻煩，臉上始終掛著讀不出情緒的笑。掛在外套上的鑰匙，是哪扇門的，無從得知。',tz_l:'「別擔心。我是來幫你的。」',tz_c:'管理員先生',
+ ho_h:'你的一天，由你選擇。',steps:[['在人設裡寫下三件事','性別（少女對你的稱呼會改變）、喜歡的寶石、小時候擅長的科目。沒寫的話，會在開始時詢問。'],['和少女走遍街道','去哪裡、調查什麼、怎麼和少女說話。仔細尋找的話，或許會發現些什麼。'],['訴說回憶','你說「想起來了」的回憶，在這場夢裡都會成真。'],['選擇結局','一天結束時，前往夜晚的海岸。結局不只一個。']],fine:'單人・純文字即可遊玩。含有成人向內容。',
+ fg_h:'遺忘',fg_p:'光是待在這條街上，記憶就會一點一點地消失。現在的你是 {n}。',fg:['沒有異常','沒有察覺到自己忘了什麼。幾乎沒有異常。','難以想起童年等久遠的記憶。','覺得不重要的記憶像蒙上了一層霧。','許多記憶變得模糊。無法立刻想起自己的過去。','覺得幾段重要的記憶像蒙上了一層霧。感到不對勁。','許多記憶缺失。感到強烈的不對勁與危機感。','不重要的記憶完全缺失。','構成自己的重要記憶缺失。感到巨大的焦躁與恐懼。','我沒有過去。也許不可能，但這是一片空白。'],
+ so_cap:'來自所有被遺忘之物',so_note:'在日文歌詞下附上翻譯。',dock0:'主題曲「ジェーン・ドゥから、あなたへ」',fgw:'遺忘',rem:'想起來',blank:'我沒有過去。……一片空白。',ft1:'預定於 EdenChat 公開',ft2:'含有成人向內容',play:'播放',pause:'暫停',moji:'縺繧譁蟄鬘髢蜷荳螟髱逕豁謌莉'},
+cn:{_name:'CN',play_ec:'在 EdenChat 游玩',back:'回到开头',lang:'zh-Hans',eyebrow:'EdenChat ／ 单人恐怖剧',t1:'简·多伊的',t2:'怪物',sub:'ジェーン・ドゥの怪物',btn:'结束今天',sound:'按下后会播放主题曲。',quiet:'不播放声音进入',
+ sl:['度过一如往常的今天，在今天即将结束时。','在不知道已经回来过多少次的自己家里，钻进被窝躺下。','大概是累了，困意很快袭来。','……。','…………。'],skip:'跳过',
+ tabs:['故事梗概','街道','登场人物','玩法','主题曲'],
+ st_h:'醒来时，那里是小时候自己的房间。',st_v1:'阳光照在眼皮上，你醒了过来。',st_p1:'楼下传来电视的声音。餐桌上摆着冒着热气的早饭。然后，一个从没见过的少女正从厨房的阴影里朝这边张望。',st_say:'「早上好……！早饭，还合口味吗？」',st_v2:'你应该认识那个少女。一直待在你身边的少女，就是她。',st_p2:'少女说她是你的青梅竹马。她希望你能把遗忘的回忆，一个一个想起来。',st_p3:'走遍怀念街道的、仅仅一天的出游。可是越走，越觉得自己正一点一点地忘记什么。',noname:'（没有名字的女孩）',
+ tw_h:'你所记得的街道。',tw_t:'选择目的地',tw_hint:'点击地图上的地点，就会前往那里。每走一步，都会忘记一点。',
+ pl:{home:['自家','小时候住过的家。早饭的热气，开着没关的电视。书架上塞满了各种童话绘本。只有父母房间的门，总是锁着。','这是你的家。少女和你一起度过的日子，不必回想，也一定还留在这里。'],park:['公园','只有滑梯、沙坑和秋千的小公园。一个人也没有。从家到这里的路上，也一个人都没有。','再一次就好。请再一次，从滑梯上滑下来。'],school:['学校','大门紧闭的老旧教学楼。稍微勉强一下就能翻过去。教室被夕阳染红，每张课桌都比记忆中还小。','少女总是坐在你旁边的座位。'],library:['图书馆','远处能看见的一栋大建筑。里面宽阔得难以从外观想象，每本书都没有书名。少女说「有点事」，没有跟着一起来。','封存在巨大建筑里的知识，换个角度看，或许也是高洁的墓碑。'],beach:['海岸','无论何时到访，都是黄昏的海。沙滩上连一个脚印都没有。少女说：「那里……留到最后好吗？」',null,'你不知道这个地方。不知道，却记得。']},
+ ca_h:'这条街上，只有两个人。',jd_s:'你的青梅竹马',jd_n:'少女',jd_d:'说自己一直待在你身边、友善又有些不安的少女。过大的开衫是借来的，胸前的名牌上什么也没写。在你想起并呼唤她之前，她还没有名字。',jd_l:'「因为，想要你想起来……。不行吗……？」',tag:'名字',tag0:'她的名字，你应该知道。',tag1:'「{n}……。是的，没错。你想起来了呢……！」',tag2:'……咦，她叫什么名字来着。',
+ tz_s:'自称图书馆管理员的男人',tz_n:'坦桑石',tz_d:'在书架无尽延伸的图书馆里等着你的男人。爱挖苦人又怕麻烦，脸上始终挂着读不出情绪的笑。挂在外套上的钥匙，是哪扇门的，无从得知。',tz_l:'「别担心。我是来帮你的。」',tz_c:'管理员先生',
+ ho_h:'你的一天，由你选择。',steps:[['在人设里写下三件事','性别（少女对你的称呼会改变）、喜欢的宝石、小时候擅长的科目。没写的话，会在开始时询问。'],['和少女走遍街道','去哪里、调查什么、怎么和少女说话。仔细寻找的话，或许会发现些什么。'],['讲述回忆','你说「想起来了」的回忆，在这场梦里都会成真。'],['选择结局','一天结束时，前往夜晚的海岸。结局不止一个。']],fine:'单人・纯文字即可游玩。含有成人向内容。',
+ fg_h:'遗忘',fg_p:'光是待在这条街上，记忆就会一点一点地消失。现在的你是 {n}。',fg:['没有异常','没有察觉到自己忘了什么。几乎没有异常。','难以想起童年等久远的记忆。','觉得不重要的记忆像蒙上了一层雾。','许多记忆变得模糊。无法立刻想起自己的过去。','觉得几段重要的记忆像蒙上了一层雾。感到不对劲。','许多记忆缺失。感到强烈的不对劲与危机感。','不重要的记忆完全缺失。','构成自己的重要记忆缺失。感到巨大的焦躁与恐惧。','我没有过去。也许不可能，但这是一片空白。'],
+ so_cap:'来自所有被遗忘之物',so_note:'在日文歌词下附上翻译。',dock0:'主题曲「ジェーン・ドゥから、あなたへ」',fgw:'遗忘',rem:'想起来',blank:'我没有过去。……一片空白。',ft1:'预定在 EdenChat 公开',ft2:'含有成人向内容',play:'播放',pause:'暂停',moji:'縺繧譁蟄鬘髢蜷荳螟髱逕豁謌莉'},
+en:{_name:'EN',play_ec:'Play on EdenChat',back:'Back to start',lang:'en',eyebrow:'EdenChat / Single-player horror drama',t1:'The Jane Doe',t2:'Monster',sub:'ジェーン・ドゥの怪物',btn:'End the day',sound:'Pressing this plays the theme song.',quiet:'Enter without sound',
+ sl:['Another ordinary day lived, and now it is ending.','In the home you have come back to more times than you can count, you crawl into bed and lie down.','Tired, you feel sleep take you almost at once.','……','…………'],skip:'Skip',
+ tabs:['Story','Town','Characters','How to play','Theme song'],
+ st_h:'When you open your eyes, you are in your childhood bedroom.',st_v1:'Sunlight falls across your eyelids, and you wake.',st_p1:'The TV murmurs downstairs. Breakfast steams on the table. And from the shadow of the kitchen, a girl you do not recognize is watching you.',st_say:'“Good morning…! How was breakfast?”',st_v2:'You know that girl. She is the one who was always at your side.',st_p2:'She says she is your childhood friend. She wants you to remember the memories you have forgotten, one by one.',st_p3:'A single day out, walking the town you miss. But the farther you walk, the more you feel yourself forgetting something, little by little.',noname:'(the girl with no name)',
+ tw_h:'The town you remember.',tw_t:'Choose where to go',tw_hint:'Tap a place on the map to go there. Every step makes you forget a little more.',
+ pl:{home:['Home','The house you grew up in. Steam from breakfast, a TV left on. The bookshelf is crammed with fairy-tale picture books. Only the door to your parents’ room is always locked.','This is your home. The days you and the girl spent together are surely still here, without your needing to remember them.'],park:['Park','A small park with only a slide, a sandbox and swings. No one is here. There was no one on the way here, either.','Just once more. Just once more, try going down the slide.'],school:['School','An old school building with its gate shut. With a little effort you can climb over. The classroom glows in the setting sun, and every desk is smaller than you remember.','The girl always sat in the seat next to yours.'],library:['Library','A large building you can see in the distance. Inside it is far vaster than it looks, and no book has a title. The girl says she has “something to do” and does not come with you.','The knowledge kept inside this great building might, seen another way, be a noble gravestone.'],beach:['Shore','Whenever you visit, the sea is at dusk. There is not a single footprint on the sand. The girl says, “Could we… save that place for last?”',null,'You do not know this place. You do not know it, but you remember it.']},
+ ca_h:'Only two people live in this town.',jd_s:'Your childhood friend',jd_n:'The girl',jd_d:'A friendly, slightly anxious girl who says she was always by your side. Her oversized cardigan is borrowed, and the name tag on her chest is blank. She has no name yet, not until you remember it and call her by it.',jd_l:'“I just… want you to remember. Is that so wrong…?”',tag:'NAME',tag0:'You should know her name.',tag1:'“{n}… Yes, that’s right. You remembered…!”',tag2:'…Wait. What was her name again?',
+ tz_s:'A man who calls himself the librarian',tz_n:'Tanzanite',tz_d:'A man who was waiting for you in a library of endless shelves. Sarcastic, idle, and never without an unreadable smile. No one knows which doors the keys on his coat belong to.',tz_l:'“Don’t worry. I’m here to help you.”',tz_c:'the librarian',
+ ho_h:'Your day is yours to choose.',steps:[['Write three things in your persona','Your gender (it changes what the girl calls you), your favorite gemstone, and the school subject you were best at as a child. If you leave them out, you will be asked at the start.'],['Walk the town with the girl','Where to go, what to search, how to talk to her. Look carefully, and you might find something.'],['Tell your memories','Any memory you say you have “remembered” becomes true inside this dream.'],['Choose an ending','When the day ends, go to the shore at night. There is more than one ending.']],fine:'Single-player, text only. Contains adult content.',
+ fg_h:'Forgetting',fg_p:'Simply being in this town makes your memories slip away. You are at {n}.',fg:['No abnormality.','You do not notice that you have forgotten something. Almost no abnormality.','Old memories, such as from early childhood, are hard to recall.','Unimportant memories feel clouded, as if by mist.','Many memories feel hazy. You cannot immediately recall your own past.','Several important memories feel clouded. Something feels wrong.','Many memories are missing. You feel a strong sense of wrongness and danger.','Unimportant memories are completely gone.','The precious memories that make you who you are are gone. You feel deep panic and fear.','You have no past. It may be impossible, but you are a blank page.'],
+ so_cap:'From All That Was Forgotten',so_note:'Translations appear under the original Japanese lyrics.',dock0:'Theme song “ジェーン・ドゥから、あなたへ”',fgw:'Forgetting',rem:'Remember',blank:'You have no past. …… You are a blank page.',ft1:'Coming to EdenChat',ft2:'Contains adult content',play:'Play',pause:'Pause',moji:'▒░▓¤ŧŋđ§ƒ'}
+};
+
+const LT={
+en:["I knew it well enough, how much it was worth","I just never once stopped to think about it","Step by step, in a life that keeps moving on","All the things I have left behind","I can’t stop to count them all, but","One by one, the second hand keeps moving","In days that never let me stop","How many things have I turned into the past?","Stories I used to love, a worn-out stuffed toy","Before I knew it, I let go of those small memories","Dreaming of shoes made of glass","Looking for boots to give a little cat","So afraid of the Snow Queen","That I held you, my dearest, tight","And yet, the one who took you","Away from me","Was time, that never stops flowing","Once-in-a-lifetime meetings, passing again in this world","All the things I have seen off","I can’t remember them all, but","Step by step, I keep climbing the stairs","On a stage I can never step down from","How many things have I given up on?","Turning the pages again and again, faded embroidery thread","Looking back, the precious memories that stay in my heart","Searching for shoes made of glass","Buying boots for a little cat","Looking the Snow Queen straight in the eye","Maybe I don’t need Gerda’s tears","I can’t go along with you, but","That’s alright, because I’m here","I stopped all of a sudden, at the crossing on my way home","A familiar scent, and my chest ached for no reason","I can no longer recall the name or the face, but","Because it was surely still there","You never got to wear the glass shoes","The cat in boots set off on a journey","Past the Snow Queen’s castle","You have grown up, just as you should","Forgetting even that you forgot","Don’t look back, keep walking","Beyond the time that keeps on flowing","I knew it well enough, how much it mattered","I just never once looked back at it"],
+ko:["충분히 알고 있었어 고마운 일이라는 걸","그저 그걸 생각해 본 적이 없었을 뿐","한 걸음 한 걸음 계속 나아가는 인생에서","두고 온 것들 전부를","하나하나 셀 수는 없지만","하나 또 하나 초침은 계속 나아가","멈출 수 없는 나날 속에서","얼마나 많은 것을 과거로 만들었을까","좋아했던 이야기 너덜너덜한 봉제인형","어느새 놓아 버린 작은 추억","유리로 만든 구두를 동경하고","아기 고양이에게 줄 장화를 찾고","눈의 여왕이 너무 무서워서","소중한 너를 꼭 끌어안았어","그런데도 너를 내 곁에서","데려가 버린 것은","끝없이 흐르는 시간이었지","일기일회 또다시 스쳐 가는 세상에서","떠나보낸 것들 전부를","다 기억할 수는 없지만","한 계단씩 계단을 계속 오르는","내려올 수 없는 무대 위에서","얼마나 많은 것을 포기했을까","몇 번이고 책장을 넘기는 빛바랜 자수실","돌아보면 마음에 남은 소중한 추억","유리로 만든 구두를 찾고","아기 고양이에게 줄 장화를 사고","눈의 여왕을 똑바로 바라보며","게르다의 눈물은 필요 없을까","함께 갈 수는 없지만","괜찮아 여기 있으니까","문득 걸음을 멈춘 돌아가는 길의 교차로","그리운 냄새에 까닭 없이 가슴이 아팠어","이름도 얼굴도 이제 떠올릴 수 없지만","그곳에 분명히 남아 있었으니까","유리 구두는 신지 못했네","장화 신은 고양이는 여행을 떠났네","눈의 여왕의 성을 넘어서","너는 제대로 어른이 되었어","잊었다는 것조차 잊은 채로","뒤돌아보지 말고 걸어가","끝없이 흐르는 시간 저편으로","충분히 알고 있었어 소중했던 것을","그저 그걸 돌아본 적이 없었을 뿐"],
+tw:["我早就深深明白 那是多麼值得感謝的事","只是從來不曾 真正去想過而已","一步一步 在不斷前進的人生裡","那些被我留在身後的一切","雖然沒辦法一一數清","一個一個 秒針不停前進","在無法停下腳步的日子裡","我把多少事 變成了過去","曾經喜歡的故事 破破爛爛的布偶","不知不覺間 放手了的 小小回憶","嚮往著 用玻璃做成的鞋","尋找著要送給小貓的長靴","因為太害怕冰雪女王","我緊緊抱住了 重要的你","即使如此 把你從我身邊","帶走的","是不停流逝的 時間啊","一期一會 在再次擦身而過的世間","那些我目送離去的一切","雖然沒辦法全都記住","一階一階 不停爬上階梯","在無法走下的舞台上","我放棄了 多少事呢","一再翻閱的書 褪了色的刺繡線","回頭望去 留在心裡的 重要回憶","尋找著用玻璃做成的鞋","為小貓買下長靴","筆直地凝視著 冰雪女王","也許不需要格爾達的眼淚了吧","雖然不能一起走","這樣就好 因為我就在這裡","忽然停下腳步 回家路上的十字路口","懷念的氣味 讓胸口莫名地痛","名字和臉 都已經想不起來了","因為它確實 還留在那裡","沒能穿上玻璃鞋呢","穿長靴的貓 踏上了旅程呢","越過冰雪女王的 城堡","你已經 好好地長大成人了","就連忘記了這件事 也一併忘記","不要回頭 繼續走下去吧","走向不停流逝的 時間的彼方","我早就深深明白 那些曾經重要的事","只是從來不曾 回頭看過而已"],
+cn:["我早就深深明白 那是多么值得感谢的事","只是从来不曾 真正去想过而已","一步一步 在不断前进的人生里","那些被我留在身后的一切","虽然没办法一一数清","一个一个 秒针不停前进","在无法停下脚步的日子里","我把多少事 变成了过去","曾经喜欢的故事 破破烂烂的布偶","不知不觉间 放手了的 小小回忆","向往着 用玻璃做成的鞋","寻找着要送给小猫的长靴","因为太害怕冰雪女王","我紧紧抱住了 重要的你","即使如此 把你从我身边","带走的","是不停流逝的 时间啊","一期一会 在再次擦肩而过的世间","那些我目送离去的一切","虽然没办法全都记住","一级一级 不停爬上台阶","在无法走下的舞台上","我放弃了 多少事呢","一再翻阅的书 褪了色的刺绣线","回头望去 留在心里的 重要回忆","寻找着用玻璃做成的鞋","为小猫买下长靴","笔直地凝视着 冰雪女王","也许不需要格尔达的眼泪了吧","虽然不能一起走","这样就好 因为我就在这里","忽然停下脚步 回家路上的十字路口","怀念的气味 让胸口莫名地痛","名字和脸 都已经想不起来了","因为它确实 还留在那里","没能穿上玻璃鞋呢","穿靴子的猫 踏上了旅程呢","越过冰雪女王的 城堡","你已经 好好地长大成人了","就连忘记了这件事 也一并忘记","不要回头 继续走下去吧","走向不停流逝的 时间的彼方","我早就深深明白 那些曾经重要的事","只是从来不曾 回头看过而已"]
+};
+
+const PLAY_URL='https://www.eden-chat.com/works/248c819d-6bcf-4f63-b9b2-352ecea6b4ed';
+const LEAD=0.5; // 歌詞を出すのを、これだけ早める(秒)
+// 各文字の歌い出し時刻を、区切り(スクショの秒数)の間で均等に割り振って推定する
+const LINES=Array.isArray(window.KARA)&&window.KARA.length?window.KARA.map(([end,cs])=>{const chars=cs.map(([t,c])=>({c,t}));const f=chars.find(x=>x.t!=null);return {s:(f?f.t:end)-0.4,e:end,t:chars.map(x=>x.c).join(''),chars}}):LYR.map(L=>{const segs=L.slice(1),chars=[];
+  segs.forEach((sg,j)=>{if(j>0)chars.push({c:'　',t:null});const st=sg[0]-LEAD,nx=j<segs.length-1?segs[j+1][0]-LEAD:L[0]-LEAD,cs=[...sg[1]],n=cs.length,d=Math.min(nx-st,n*0.3+0.25);
+    cs.forEach((c,k)=>chars.push({c,t:/[\s　]/.test(c)?null:st+d*k/n}))});
+  return {s:segs[0][0]-LEAD,e:L[0]-LEAD,t:segs.map(x=>x[1]).join('　'),chars}});
+function karaHTML(el,i){el.textContent='';LINES[i].chars.forEach((ch,k)=>{const s=document.createElement('span');s.textContent=ch.c;s.style.setProperty('--k',k);if(ch.t!=null)s.dataset.time=ch.t.toFixed(2);el.appendChild(s)})}
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const au=$('#au'),VIEWS=['story','town','cast','howto','song'],PLACE_ICON={home:'🏠',park:'🛝',school:'🏫',library:'📚',beach:'🌊'};
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- 言語 ----------
+const LANGS=['ja','ko','tw','cn','en'];
+function pickLang(){const s=store.get('jd-lang');if(LANGS.includes(s))return s;const n=(navigator.language||'ja').toLowerCase();
+  if(n.startsWith('ko'))return 'ko';if(n.startsWith('zh')){return /tw|hk|mo|hant/.test(n)?'tw':'cn'}if(n.startsWith('ja'))return 'ja';return n.startsWith('en')?'en':'ja'}
+let L=pickLang(),T=I18N[L];
+$$('.langs').forEach(g=>{g.innerHTML=LANGS.map(k=>'<button type="button" data-lang="'+k+'" lang="'+I18N[k].lang+'">'+I18N[k]._name+'</button>').join('')});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-lang]');if(b){setLang(b.dataset.lang)}});
+function setLang(k){L=k;T=I18N[k];store.set('jd-lang',k);render()}
+function render(){
+  document.documentElement.lang=T.lang;
+  $$('[data-t]').forEach(el=>{const v=T[el.dataset.t];el.textContent=v==null?'':v});
+  $$('[data-tab]').forEach(a=>a.textContent=T.tabs[+a.dataset.tab]);
+  $$('[data-t-tab]').forEach(a=>a.textContent=T.tabs[+a.dataset.tTab]);
+  $$('#lines p').forEach((p,i)=>p.textContent=T.sl[i]);
+  $$('.langs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===L));
+  $$('.pin').forEach(b=>b.querySelector('span').textContent=T.pl[b.dataset.place][0]);
+  $('#steps').innerHTML=T.steps.map(s=>'<li><div><b></b><span></span></div></li>').join('');
+  $$('#steps li').forEach((li,i)=>{li.querySelector('b').textContent=T.steps[i][0];li.querySelector('span').textContent=T.steps[i][1]});
+  $('#forgetList').innerHTML=T.fg.map((t,i)=>'<li data-i="'+i+'"><i>'+i+'</i><span></span></li>').join('');
+  $$('#forgetList li span').forEach((s,i)=>s.textContent=T.fg[i]);
+  $$('.ec-link').forEach(a=>a.href=PLAY_URL);$('#backBtn').setAttribute('aria-label',T.back);
+  renderPlace();paintAll();setPP();if(typeof paintLyricTr==='function')paintLyricTr();cur=-2;tick();
+}
+
+// ---------- 入口 → 眠り → 本編 ----------
+let entered=false,sleepTimers=[];
+function showApp(view,instant){
+  entered=true;document.body.classList.remove('locked');
+  const en=$('#entry');en.classList.add('gone');if(instant)en.hidden=true;else setTimeout(()=>en.hidden=true,1300);
+  $('#app').hidden=false;$('#dock').hidden=false;
+  route(view||'story');startForgetClock();
+}
+function sleepSequence(){
+  const sl=$('#sleep'),ps=$$('#lines p');sl.hidden=false;sl.classList.remove('wake');ps.forEach(p=>p.classList.remove('on','out'));void sl.offsetWidth;sl.classList.add('on');
+  const at=[700,2500,4600,6300,7300];
+  ps.forEach((p,i)=>sleepTimers.push(setTimeout(()=>p.classList.add('on'),at[i])));
+  sleepTimers.push(setTimeout(()=>{ps.forEach(p=>p.classList.add('out'));sl.classList.add('wake')},8200));
+  // 暗転しきったら、その裏で入口を消して本編に切り替えておく
+  sleepTimers.push(setTimeout(()=>showApp('story',true),1600));
+  sleepTimers.push(setTimeout(()=>sl.classList.remove('on'),9000));
+  sleepTimers.push(setTimeout(()=>{sl.hidden=true},10700));
+}
+$('#sleepBtn').addEventListener('click',()=>{au.currentTime=0;playSafe();sleepSequence()});
+$('#quietBtn').addEventListener('click',()=>showApp('story'));
+$('#skipBtn').addEventListener('click',()=>{sleepTimers.forEach(clearTimeout);const sl=$('#sleep');sl.classList.remove('on');sl.hidden=true;if(!au.paused&&au.currentTime<8.5)au.currentTime=8.5;if(!entered)showApp('story',true)});
+document.body.classList.add('locked');
+
+function backToStart(){
+  if(crumbled)remember();
+  sleepTimers.forEach(clearTimeout);sleepTimers=[];au.pause();
+  entered=false;document.body.classList.add('locked');
+  $('#app').hidden=true;$('#dock').hidden=true;
+  const e=$('#entry');e.hidden=false;requestAnimationFrame(()=>e.classList.remove('gone'));
+  history.replaceState(null,'',location.pathname+location.search);window.scrollTo(0,0);
+}
+$('#backBtn').addEventListener('click',backToStart);
+
+// ---------- タブ ----------
+let curView='story';
+function route(v){
+  if(!VIEWS.includes(v))v='story';curView=v;
+  $$('.view').forEach(s=>s.hidden=s.dataset.view!==v);
+  $$('nav.tabs a').forEach(a=>a.getAttribute('href')==='#'+v?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+  if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);
+  window.scrollTo(0,0);garbleView();
+}
+window.addEventListener('hashchange',()=>{if(entered&&!crumbled)route(location.hash.slice(1))});
+
+// ---------- 名札 ----------
+const nameInput=$('#nameInput');let girlName=store.get('jd-name')||'';nameInput.value=girlName;
+function garbleWord(w,lv){const r=rnd(hash(w)+lv);return [...w].map(ch=>r()<.25+lv*.06?T.moji[Math.floor(r()*T.moji.length)]:ch).join('')}
+function paintName(){
+  const shown=girlName&&forget>=5?garbleWord(girlName,forget):girlName;
+  $$('.jd-cap').forEach(c=>c.textContent=shown||T.noname);
+  $$('.jd-name').forEach(c=>c.textContent=shown||T.jd_n);
+  $('#tagNote').textContent=girlName?(forget>=5?T.tag2:T.tag1.replace('{n}',girlName)):T.tag0;
+}
+nameInput.addEventListener('input',()=>{girlName=nameInput.value.trim();store.set('jd-name',girlName);paintName()});
+
+// ---------- 忘却 ----------
+const RATE=[0,0,.012,.025,.04,.06,.085,.11,.15,.2];
+function rnd(seed){let s=seed>>>0;return()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/4294967296}}
+function hash(str){let h=2166136261;for(const c of str){h^=c.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0}
+const ORIG=new WeakMap(),KEEP=/[\s「」『』、。，．・…！？!?（）()“”"'’,.;:—\-0-9]/;
+function textNodes(root){const out=[],w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){const p=n.parentElement;if(!p||!n.nodeValue.trim())return 2;if(p.closest('.jd-name,.jd-cap,.tag,.song-head,.lyrics,.pin .ico'))return 2;return 1}});let n;while(n=w.nextNode())out.push(n);return out}
+function allText(root){const out=[],w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){return n.nodeValue.trim()&&!n.parentElement.closest('svg,.ico')?1:2}});let n;while(n=w.nextNode())out.push(n);return out}
+function garbleView(){
+  const v=document.querySelector('.view[data-view="'+curView+'"]');if(!v)return;
+  const rate=RATE[forget];
+  textNodes(v).forEach(n=>{let o=ORIG.get(n);if(o==null||(n.nodeValue!==o&&!n.__g)){o=n.nodeValue;ORIG.set(n,o)}
+    if(!rate){n.nodeValue=o;n.__g=false;return}
+    const r=rnd(hash(o)+forget*131);n.nodeValue=[...o].map(ch=>KEEP.test(ch)||r()>rate?ch:T.moji[Math.floor(r()*T.moji.length)]).join('');n.__g=true});
+}
+let forget=0,crumbled=false;
+function paintAll(){
+  document.documentElement.style.setProperty('--forget',Math.min(forget,8));
+  $('#fNow').textContent=forget;$('#fgP').textContent=T.fg_p.replace('{n}',forget);
+  $$('#forgetList li').forEach(li=>li.classList.toggle('now',+li.dataset.i===forget));
+  $('#rememberBtn').hidden=forget===0;
+  $('#where').textContent='📍'+PLACE_ICON[here]+T.pl[here][0]+'｜';
+  paintName();garbleView();
+}
+function addForget(k=1){if(crumbled)return;forget=Math.min(9,forget+k);paintAll();if(forget>=9)crumble()}
+function remember(){
+  if(crumbled){crumbled=false;$$('.crumble-clone').forEach(c=>c.remove());$$('.view').forEach(v=>v.style.visibility='');
+    $$('header.top,#dock,footer').forEach(e=>e.classList.remove('fadeout'));const b=$('#blank');b.classList.remove('show');setTimeout(()=>b.hidden=true,1000)}
+  forget=0;paintAll();
+}
+$('#rememberBtn').addEventListener('click',remember);$('#blankBtn').addEventListener('click',remember);
+let clock=null;function startForgetClock(){if(clock)return;clock=setInterval(()=>{if(!document.hidden&&forget<8)addForget()},80000)}
+
+// 9:さらさらと崩れる
+function crumble(){
+  crumbled=true;const v=document.querySelector('.view[data-view="'+curView+'"]'),b=$('#blank');
+  if(reduce){b.hidden=false;b.classList.add('show');return}
+  const c=v.cloneNode(true);c.classList.add('crumble-clone');c.removeAttribute('data-view');c.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
+  v.after(c);v.style.visibility='hidden';c.style.position='absolute';c.style.left='0';c.style.right='0';c.style.top=v.offsetTop+'px';
+  const vh=innerHeight,y0=scrollY,R=rnd(Date.now());let count=0;
+  const delay=el=>{const r=el.getBoundingClientRect();const top=Math.max(0,Math.min(1,(r.top)/vh));return (top*1.6+R()*0.9).toFixed(2)+'s'};
+  allText(c).forEach(n=>{
+    const parts=n.nodeValue.match(/\s+|[A-Za-z’'\-]+|[\s\S]/gu)||[];const f=document.createDocumentFragment();
+    parts.forEach(p=>{if(/^\s+$/.test(p)){f.appendChild(document.createTextNode(p));return}
+      const mk=ch=>{const s=document.createElement('span');s.className='sand';s.textContent=ch;s.style.setProperty('--dx',((R()-.5)*50).toFixed(0)+'px');s.style.setProperty('--dy',(40+R()*140).toFixed(0)+'px');s.style.setProperty('--r',((R()-.5)*90).toFixed(0)+'deg');count++;return s};
+      if(p.length>1){const w=document.createElement('span');w.className='sandw';[...p].forEach(ch=>w.appendChild(mk(ch)));f.appendChild(w)}else f.appendChild(mk(p))});
+    n.replaceWith(f)});
+  c.querySelectorAll('.sand').forEach(s=>s.style.setProperty('--d',delay(s)));
+  c.querySelectorAll('figure,.map,.tag,.label,.forget-tbl li i,.steps li').forEach(e=>{e.classList.add('dust');e.style.setProperty('--d',delay(e))});
+  requestAnimationFrame(()=>c.classList.add('crumble'));
+  $$('header.top,#dock,footer').forEach(e=>e.classList.add('fadeout'));
+  setTimeout(()=>{b.hidden=false;requestAnimationFrame(()=>b.classList.add('show'))},3400);
+}
+
+// ---------- 街 ----------
+let here='home',visited=false;
+function renderPlace(){
+  const el=$('#place');
+  if(!visited){el.classList.remove('dusk');el.innerHTML='<h3></h3><p class="hint"></p>';el.querySelector('h3').textContent=T.tw_t;el.querySelector('.hint').textContent=T.tw_hint;return}
+  const p=T.pl[here];el.classList.toggle('dusk',here==='beach');
+  el.innerHTML='<h3></h3><p></p><p class="voice-line"></p>';
+  el.querySelector('h3').textContent=PLACE_ICON[here]+' '+p[0];el.querySelector('p').textContent=p[1];
+  const vl=el.querySelector('.voice-line');if(p[2]){vl.innerHTML='<b>「　　」</b><span></span>';vl.querySelector('span').textContent=p[2]}else vl.textContent=p[3];
+}
+$$('.pin').forEach(b=>b.addEventListener('click',()=>{
+  if(crumbled)return;const k=b.dataset.place,moved=k!==here||!visited;here=k;visited=true;
+  $$('.pin').forEach(x=>x.setAttribute('aria-pressed',x===b));renderPlace();
+  if(moved)addForget();else paintAll();
+}));
+
+// ---------- 主題歌 ----------
+function audioMsg(m){const d=document.getElementById('dockLyric');if(!d)return;d.textContent=m;d.classList.add('idle');cur=-3}
+function playSafe(){const p=au.play();if(p&&p.catch)p.catch(e=>{console.warn('play failed',e);audioMsg('再生できませんでした（'+(e&&e.name||'不明')+'）。もう一度 ▶ を押してください。')})}
+au.addEventListener('error',()=>{const c=au.error&&au.error.code;console.warn('audio error',c);audioMsg('曲を読み込めませんでした（エラー '+c+'）。ページを読み込み直してください。')});
+au.addEventListener('stalled',()=>console.warn('audio stalled'));
+const ll=$('#lyricList');
+LINES.forEach((l,i)=>{const li=document.createElement('li');if(i>0&&l.s-LINES[i-1].e>3)li.innerHTML='<div class="gap"></div>';const b=document.createElement('button');b.type='button';b.innerHTML='<span lang="ja" class="kara"></span><small class="tr"></small>';karaHTML(b.firstChild,i);b.addEventListener('click',()=>{au.currentTime=Math.max(0,l.s-0.3);playSafe();kick()});li.appendChild(b);ll.appendChild(li)});
+const lyrBtns=$$('#lyricList button');
+function paintLyricTr(){const tr=LT[L];lyrBtns.forEach((b,i)=>{const sm=b.querySelector('.tr');sm.textContent=tr?tr[i]:'';sm.hidden=!tr})}
+const PLAY='<path d="M5 3l12 7-12 7z" fill="currentColor"/>',PAUSE='<path d="M5 3h3.5v14H5zM11.5 3H15v14h-3.5z" fill="currentColor"/>';
+let dur=264.84,cur=-2;
+function setPP(){const p=au.paused;$('#ppIcon').innerHTML=p?PLAY:PAUSE;$('#pp').setAttribute('aria-label',p?T.play:T.pause)}
+$('#pp').addEventListener('click',()=>au.paused?playSafe():au.pause());
+au.addEventListener('play',setPP);au.addEventListener('pause',setPP);
+au.addEventListener('loadedmetadata',()=>{if(isFinite(au.duration))dur=au.duration});
+au.addEventListener('timeupdate',tick);au.addEventListener('seeked',tick);
+// 今の行:歌っている最中の行。間奏では直前の行を薄く残し、曲の前後だけ曲名を出す
+function lineAt(t){let last=-1;for(let k=0;k<LINES.length;k++){if(LINES[k].s<=t)last=k;else break}
+  if(last<0)return {i:-1,held:false};const l=LINES[last];
+  if(t<l.e+0.3)return {i:last,held:false};
+  if(last===LINES.length-1&&t>l.e+4)return {i:-1,held:false};
+  return {i:last,held:true}}
+let heldNow=false;
+function tick(){const t=au.currentTime;$('#fill').style.width=Math.min(100,t/dur*100)+'%';$('#bar').setAttribute('aria-valuenow',Math.floor(t));
+  const {i,held}=lineAt(t);const d=$('#dockLyric');
+  if(i!==cur){cur=i;
+    if(i>=0){d.innerHTML='<span lang="ja" class="kara enter"></span><small class="tr"></small>';karaHTML(d.firstChild,i);const tr=LT[L];d.lastChild.textContent=tr?tr[i]:'';d.lastChild.hidden=!tr;d.classList.remove('idle')}
+    else{d.textContent=T.dock0;d.classList.add('idle')}
+    lyrBtns.forEach((bt,j)=>{bt.classList.toggle('cur',j===i);if(j!==i)bt.firstChild.querySelectorAll('.lit').forEach(x=>x.classList.remove('lit'))});}
+  if(held!==heldNow||i!==cur){heldNow=held}d.classList.toggle('held',held);
+  lyrBtns.forEach((bt,j)=>bt.classList.toggle('held',j===i&&held));
+  light(t)}
+function light(t){if(cur<0)return;const tt=t+0.05;
+  [$('#dockLyric .kara'),lyrBtns[cur]&&lyrBtns[cur].firstChild].forEach(el=>{if(!el)return;el.querySelectorAll('span[data-time]').forEach(x=>x.classList.toggle('lit',+x.dataset.time<=tt))})}
+let raf=0;function loop(){tick();raf=au.paused?0:requestAnimationFrame(loop)}
+function kick(){if(!raf)raf=requestAnimationFrame(loop)}
+au.addEventListener('play',kick);
+function seek(x){const r=$('#bar').getBoundingClientRect();au.currentTime=Math.max(0,Math.min(1,(x-r.left)/r.width))*dur;tick()}
+$('#bar').addEventListener('pointerdown',e=>{const bar=$('#bar');bar.setPointerCapture(e.pointerId);seek(e.clientX);const mv=ev=>seek(ev.clientX),up=()=>{bar.removeEventListener('pointermove',mv);bar.removeEventListener('pointerup',up)};bar.addEventListener('pointermove',mv);bar.addEventListener('pointerup',up)});
+$('#bar').addEventListener('keydown',e=>{if(e.key==='ArrowRight'){au.currentTime=Math.min(dur,au.currentTime+5);e.preventDefault()}if(e.key==='ArrowLeft'){au.currentTime=Math.max(0,au.currentTime-5);e.preventDefault()}});
+
+// 入口の星
+{const w=$('.win');for(let i=0;i<22;i++){const s=document.createElement('i');s.className='star';s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*55)+'%';s.style.animationDelay=(Math.random()*4)+'s';w.appendChild(s)}}
+
+render();
+{const h=location.hash.slice(1);if(VIEWS.includes(h))showApp(h)}
+</script>
+
+</body>
+</html>
