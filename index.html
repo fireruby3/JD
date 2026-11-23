@@ -160,7 +160,7 @@ h2{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.6vw,2.3re
 /* ===== 下の帯:ステータスウィンドウ兼プレイヤー ===== */
 #dock{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(37,35,58,.95);color:#ece9f2;padding-bottom:env(safe-area-inset-bottom,0px)}
 #dock[hidden]{display:none}
-.dock-in{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.9rem;align-items:center;min-height:68px;padding-block:.5rem}
+.dock-in{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:.9rem;align-items:center;min-height:68px;padding-block:.5rem}
 .pp{width:44px;height:44px;border-radius:50%;border:0;background:#ece9f2;color:var(--ink);display:grid;place-items:center}
 .pp svg{width:17px;height:17px}
 .dock-mid{min-width:0}
@@ -202,6 +202,17 @@ footer a{color:var(--ink)}
 .bar{position:relative;height:16px;cursor:pointer;touch-action:none;margin-top:.1rem}
 .bar::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:rgba(236,233,242,.2)}
 .bar .fill{position:absolute;left:0;top:7px;height:2px;width:0;background:repeating-linear-gradient(to right,#e0566c 0 7px,transparent 7px 11px)}
+.vol{position:relative;display:flex;align-items:center;gap:.4rem}
+.volbtn{width:34px;height:34px;border:0;border-radius:50%;background:none;color:#ece9f2;display:grid;place-items:center;cursor:pointer}
+.volbtn:hover{background:rgba(255,255,255,.1)}
+.volbtn svg{width:20px;height:20px}
+.volpop{display:flex;align-items:center}
+.vol input{width:88px;accent-color:#e0566c;cursor:pointer;margin:0}
+@media (max-width:760px){
+  .volpop{display:none;position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);background:rgba(37,35,58,.97);border-radius:10px;padding:.7rem .9rem;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+  .vol.open .volpop{display:flex}
+  .vol input{width:130px}
+}
 .status{display:flex;align-items:center;gap:.6rem;font-size:.85rem;white-space:nowrap;font-variant-numeric:tabular-nums}
 .status .sw{background:rgba(255,255,255,.08);border-radius:6px;padding:.25rem .6rem}
 .remember{background:none;border:1px solid rgba(236,233,242,.4);color:#ece9f2;border-radius:999px;padding:.2rem .8rem;font-size:.8rem}
@@ -406,6 +417,7 @@ html[lang="en"] .title [data-t="t1"]::after,html[lang="ko"] .title [data-t="t1"]
       <div class="dock-lyric idle" id="dockLyric"></div>
       <div class="bar" id="bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="265" aria-valuenow="0"><div class="fill" id="fill"></div></div>
     </div>
+    <div class="vol" id="volWrap"><button class="volbtn" id="volBtn" type="button" aria-label="Volume"><svg id="volIcon" viewBox="0 0 20 20" aria-hidden="true"></svg></button><div class="volpop"><input type="range" id="vol" min="0" max="100" step="1" value="70" aria-label="Volume"></div></div>
     <div class="status"><span class="sw"><span class="where" id="where"></span><span data-t="fgw"></span> <b id="fNow">0</b>/9</span><button class="remember" id="rememberBtn" type="button" hidden data-t="rem"></button></div>
   </div>
 </div>
@@ -700,6 +712,20 @@ function paintLyricTr(){const tr=LT[L];lyrBtns.forEach((b,i)=>{const sm=b.queryS
 const PLAY='<path d="M5 3l12 7-12 7z" fill="currentColor"/>',PAUSE='<path d="M5 3h3.5v14H5zM11.5 3H15v14h-3.5z" fill="currentColor"/>';
 let dur=264.84,cur=-2;
 function setPP(){const p=au.paused;$('#ppIcon').innerHTML=p?PLAY:PAUSE;$('#pp').setAttribute('aria-label',p?T.play:T.pause)}
+// 音量（デスクトップは横のバー、スマホはアイコンを押すとバーが出る。iPhoneは本体の音量ボタンのみ効く）
+const VOL_ICON={on:'<path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path d="M13 7a4 4 0 0 1 0 6M15.3 4.8a7 7 0 0 1 0 10.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+ low:'<path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path d="M13 7a4 4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+ off:'<path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path d="M13 7.5l5 5M18 7.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'};
+const volIn=$('#vol'),volWrap=$('#volWrap'),narrow=matchMedia('(max-width:760px)');
+function setVolIcon(){const v=au.muted?0:au.volume;$('#volIcon').innerHTML=v===0?VOL_ICON.off:v<.5?VOL_ICON.low:VOL_ICON.on;volIn.value=Math.round(v*100)}
+{let v=parseFloat(store.get('jd_vol'));if(!(v>=0&&v<=1))v=.7;au.volume=v;au.muted=store.get('jd_mute')==='1';setVolIcon()}
+volIn.addEventListener('input',()=>{const v=volIn.value/100;au.volume=v;au.muted=v===0;if(v>0)store.set('jd_vol',v);store.set('jd_mute',au.muted?'1':'0');setVolIcon()});
+let volBefore=au.volume||.7;
+$('#volBtn').addEventListener('click',()=>{
+  if(narrow.matches){volWrap.classList.toggle('open');return}
+  if(au.muted||au.volume===0){au.muted=false;if(au.volume===0)au.volume=volBefore}else{volBefore=au.volume;au.muted=true}
+  store.set('jd_mute',au.muted?'1':'0');setVolIcon()});
+document.addEventListener('pointerdown',e=>{if(!volWrap.contains(e.target))volWrap.classList.remove('open')});
 $('#pp').addEventListener('click',()=>au.paused?playSafe():au.pause());
 au.addEventListener('play',setPP);au.addEventListener('pause',setPP);
 au.addEventListener('loadedmetadata',()=>{if(isFinite(au.duration))dur=au.duration});
